@@ -1,5 +1,5 @@
-from objects.GitRepo import repo_find, object_find, object_read
-
+from objects.GitRepo import repo_find, object_read, object_find
+import sys
 
 def register(subparsers):
     """
@@ -20,5 +20,7 @@ def cmd_cat_file(args):
     Display the contents of the object
     """
     repo = repo_find()
+    # TODO: Reimplement object_find appropriately based on the object type after
     found_obj = object_find(repo, args.type.encode(), args.object)
-    sys.stdout.buffer.write(object_read(repo, found_obj).serialize())
+    print(f"Object {args.object}")
+    sys.stdout.buffer.write(object_read(repo, args.object).serialize())

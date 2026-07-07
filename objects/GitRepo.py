@@ -1,7 +1,7 @@
 import os
 import configparser
 import zlib
-
+from .GitObjectFactory import object_create
 
 class GitRepository:
     def __init__(self, path, force=False):
@@ -28,6 +28,8 @@ def repo_file(repo, *path, mkdir=False):
     Return and optionally create a path to a file. 
     Creates directory up until the last component
     """
+    print(f"Path: {path}")
+    print(repo)
     dir_path = repo_dir(repo, *path[:-1], mkdir=mkdir)
     if dir_path:
         return repo_path(repo, *path)
@@ -108,6 +110,7 @@ def repo_create(path):
         config.write(f)
 
     return repo
+
 def object_read(repo, sha):
     """
     Read object based on its sha
@@ -122,15 +125,20 @@ def object_read(repo, sha):
 
     decompressed = zlib.decompress(binary_data)
     # Extract the object TYPE
-    obj_type_idx = decompressed.find(b"0x20")
+    obj_type_idx = decompressed.find(b' ')
     obj_type = decompressed[:obj_type_idx]
 
     # Extract the object SIZE
-    obj_size_idx = decompressed.find(b"0x00")
+    obj_size_idx = decompressed.find(b'\x00')
     obj_size = int(decompressed[obj_type_idx+1:obj_size_idx].decode("ascii"))
-
-    #Make sure the size matches the length of the data itself
+    print(f"Object type:{obj_type.decode('ascii')}")
+    print(f"Object size:{obj_size}")
+    # Exclude the header and compare the data size vs actual decompressed data length
+    if obj_size != (len(decompressed)-obj_size_idx-1):
+        return None
     #Call the appropriate constructor based on the obj type
+    return object_create(obj_type, decompressed[obj_size_idx+1:])
+    
 
 def object_write(repo, obj):
     """
