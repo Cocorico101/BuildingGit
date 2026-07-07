@@ -1,8 +1,5 @@
 
 from abc import ABC, abstractmethod
-import hashlib
-import os
-import zlib
 
 class GitObject(ABC):
     def __init__(self, data=None):

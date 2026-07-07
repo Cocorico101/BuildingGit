@@ -19,6 +19,7 @@ except ModuleNotFoundError:
 COMMAND_MODULES = [
     "commands.init",
     "commands.cat-file",
+    "commands.hash-object",
     # "commands.commit"
 ]
 

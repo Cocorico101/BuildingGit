@@ -1,6 +1,7 @@
 import os
 import configparser
 import zlib
+import hashlib
 from .GitObjectFactory import object_create
 
 class GitRepository:
@@ -28,8 +29,6 @@ def repo_file(repo, *path, mkdir=False):
     Return and optionally create a path to a file. 
     Creates directory up until the last component
     """
-    print(f"Path: {path}")
-    print(repo)
     dir_path = repo_dir(repo, *path[:-1], mkdir=mkdir)
     if dir_path:
         return repo_path(repo, *path)
@@ -131,8 +130,6 @@ def object_read(repo, sha):
     # Extract the object SIZE
     obj_size_idx = decompressed.find(b'\x00')
     obj_size = int(decompressed[obj_type_idx+1:obj_size_idx].decode("ascii"))
-    print(f"Object type:{obj_type.decode('ascii')}")
-    print(f"Object size:{obj_size}")
     # Exclude the header and compare the data size vs actual decompressed data length
     if obj_size != (len(decompressed)-obj_size_idx-1):
         return None
@@ -146,7 +143,7 @@ def object_write(repo, obj):
     """
     # Write the type
     data = obj.serialize()
-    payload = obj.fmt + b"0x20" +  str(len(data)).encode() + b"0x00" + data
+    payload = obj.fmt + b' ' +  str(len(data)).encode() + b'\x00' + data
 
     # Compute the sha
     sha = hashlib.sha1(payload).hexdigest()
