@@ -1,10 +1,10 @@
 from .BlobObject import BlobObject
-
+from .CommitObject import CommitObject
 
 class GitObjectFactory:
     TYPE_TO_CONSTRUCTOR = {
         b"blob": BlobObject,
-        # b"commit": CommitObject,
+        b"commit": CommitObject,
         # b"tree": TreeObject,
         # b"tag": TagObject,
     }

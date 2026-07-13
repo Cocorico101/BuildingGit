@@ -34,7 +34,7 @@ def commit_serialize(commit):
     return data
 
 
-def commit_parse(obj, start_idx, dictionary = None):
+def commit_parse(obj, start_idx=0, dictionary = None):
     """
 'tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147
 parent 206941306e8a8af65b66eaaaea388a7ae24d49a0
@@ -61,6 +61,8 @@ Create first draft'
 
 Deconstruct the commit object into a dictionary
 """
+    if not dictionary:
+        dictionary = dict()
     # Find the index of the first space and first new line
     space_idx = obj.find(b' ', start_idx)
     new_line_idx = obj.find(b'\n', start_idx)
@@ -81,9 +83,9 @@ Deconstruct the commit object into a dictionary
         if obj[value_end+1] != ord(' '):
             break
 
-    
     value = obj[space_idx+1:value_end].replace(b'\n ', b'\n')
-
+    print(f"key: {key}")
+    print(f"value: {value}")
     if key in dictionary:
         # If a list of values already exists
         if type(dictionary[key]) == list:

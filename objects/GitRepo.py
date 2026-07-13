@@ -156,4 +156,5 @@ def object_write(repo, obj):
     return sha
             
 def object_find(repo, name, fmt=None, follow=True):
+    print(f"name: {name}")
     return name
