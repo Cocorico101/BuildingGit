@@ -15,11 +15,12 @@ def cmd_log(args):
     Display the history of the commit
     """
     repo = repo_find()
-    print(f" args.commit: {args.commit}")
     found_obj = object_find(repo, args.commit)
     seen = set()
-    print(f"repo: {repo}")
+    print("digraph wyaglog{")
+    print("  node[shape=rect]")
     log_graphviz(repo, found_obj, seen)
+    print("}")
 
 
 def log_graphviz(repo, sha, seen):
@@ -37,13 +38,8 @@ def log_graphviz(repo, sha, seen):
     # Assert to make sure the sha points to a commit
     assert commit.fmt == b'commit'
         
-    # Base case
-    if b'parent' not in commit.commitdata:
-        return
-
     # Display the commit messages - human readable
     message = commit.commitdata[None].decode("utf8").strip()
-    print(f"message {message}")
     # Escape special characters
     message = message.replace("\\", "\\\\")
     message = message.replace("\"", "\\\"")
@@ -51,6 +47,10 @@ def log_graphviz(repo, sha, seen):
     if '\n' in message:
         message = message[:message.index('\n')]
     print(f"  c_{sha} [label=\"{sha[0:7]}: {message}\"]")
+
+    # Base case
+    if b'parent' not in commit.commitdata:
+        return
 
     
     # Recursive case - traverse the parents

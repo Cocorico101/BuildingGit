@@ -84,8 +84,6 @@ Deconstruct the commit object into a dictionary
             break
 
     value = obj[space_idx+1:value_end].replace(b'\n ', b'\n')
-    print(f"key: {key}")
-    print(f"value: {value}")
     if key in dictionary:
         # If a list of values already exists
         if type(dictionary[key]) == list:
