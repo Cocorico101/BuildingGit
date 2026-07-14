@@ -5,7 +5,7 @@ class GitObjectFactory:
     TYPE_TO_CONSTRUCTOR = {
         b"blob": BlobObject,
         b"commit": CommitObject,
-        # b"tree": TreeObject,
+        b"tree": TreeObject,
         # b"tag": TagObject,
     }
 
