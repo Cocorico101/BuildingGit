@@ -1,5 +1,6 @@
 from .BlobObject import BlobObject
 from .CommitObject import CommitObject
+from .TreeObject import TreeObject
 
 class GitObjectFactory:
     TYPE_TO_CONSTRUCTOR = {

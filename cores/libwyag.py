@@ -21,7 +21,7 @@ COMMAND_MODULES = [
     "commands.cat-file",
     "commands.hash-object",
     "commands.log",
-    "commands.ls-tree"
+    "commands.ls-tree",
     # "commands.commit"
 ]
 

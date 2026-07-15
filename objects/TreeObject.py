@@ -1,13 +1,13 @@
 from .GitObject import GitObject
 
-class TreeNode(GitObject):
+class TreeNode(object):
     def __init__(self, mode, path, sha):
         self.mode = mode
         self.path = path
         self.sha = sha
 
 class TreeObject(GitObject):
-    self.fmt = b'tree'
+    fmt = b'tree'
     def init(self):
         self.tree_data = []
 
@@ -18,10 +18,15 @@ class TreeObject(GitObject):
     def deserialize(self, obj):
         self.tree_data = tree_deserialize(obj)
 
+def tree_leaf_sort_key(leaf):
+    # Append the / if its a directory
+    if leaf.mode.startswith(b'04'):
+        return leaf.path + "/"
+    return leaf.path
 
 
-
-def tree_serialize(self, tree_obj):
+def tree_serialize(tree_obj):
+    tree_obj.sort(key=tree_leaf_sort_key)
     raw = b""
     for node in tree_obj.tree_data:
         mode, path, sha = node.mode, node.path, node.sha
@@ -31,7 +36,7 @@ def tree_serialize(self, tree_obj):
         raw += raw_sha
     return raw
 
-def tree_deserialize(self, raw):
+def tree_deserialize(raw):
     data = []
     i = 0
     length = len(raw)
@@ -42,15 +47,15 @@ def tree_deserialize(self, raw):
     return data
 
 
-def tree_deserialize_one(self, raw, start=0):
+def tree_deserialize_one(raw, start=0):
     # Parse for the mode
     space_idx = raw.find(b' ', start)
     file_mode = raw[start:space_idx]
     # Make sure the mode is 5 or 6 bytes
     assert space_idx - start == 5 or space_idx - start == 6
     # Normalize it all to 6 bytes
-    if len(mode) == 5:
-        mode = b"0" + mode
+    if len(file_mode) == 5:
+        file_mode = b"0" + file_mode
 
     # Parse for the path
     null_idx = raw.find(b'\x00', space_idx)
@@ -58,4 +63,4 @@ def tree_deserialize_one(self, raw, start=0):
     # Convert sha 20 bytes of binary into lowercase hex
     sha = raw[null_idx+1:null_idx+21].hex()
 
-    return (null_idx+21, TreeObject(file_mode, path.decode("utf8"), sha))
+    return (null_idx+21, TreeNode(file_mode, path.decode("utf8"), sha))
