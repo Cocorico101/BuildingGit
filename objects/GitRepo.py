@@ -119,6 +119,9 @@ def object_read(repo, sha):
     # Find the path based on its sha
     # First two is the directory + filename as the remaining
     path = repo_file(repo, "objects", sha[:2], sha[2:])
+    # Return None if path doesn't exist
+    if not path or not os.path.isfile(path):
+        return None
     # Read the file at that path in binary format + decompress via zlib
     with open(path, 'rb') as file:
         binary_data = file.read()
@@ -175,7 +178,7 @@ def sha_find(repo, name, fmt=None, follow=True):
     # Validate type if requested
     if sha and fmt:
         obj = object_read(repo, sha)
-        if obj and obj.fmt != fmt:
+        if not obj or obj.fmt != fmt:
             return None
     
     return sha
