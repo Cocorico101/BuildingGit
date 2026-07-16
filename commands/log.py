@@ -1,4 +1,4 @@
-from objects.GitRepo import repo_find, object_read, object_find
+from objects.GitRepo import repo_find, object_read, sha_find
 
 
 
@@ -15,11 +15,11 @@ def cmd_log(args):
     Display the history of the commit
     """
     repo = repo_find()
-    found_obj = object_find(repo, args.commit)
+    sha = sha_find(repo, args.commit)
     seen = set()
     print("digraph wyaglog{")
     print("  node[shape=rect]")
-    log_graphviz(repo, found_obj, seen)
+    log_graphviz(repo, sha, seen)
     print("}")
 
 
@@ -33,13 +33,13 @@ def log_graphviz(repo, sha, seen):
     # Track cycles
     seen.add(sha)
     # Find the commit object
-    commit = object_read(repo, sha)
+    commit_obj = object_read(repo, sha)
 
     # Assert to make sure the sha points to a commit
-    assert commit.fmt == b'commit'
+    assert commit_obj.fmt == b'commit'
         
     # Display the commit messages - human readable
-    message = commit.commitdata[None].decode("utf8").strip()
+    message = commit_obj.commitdata[None].decode("utf8").strip()
     # Escape special characters
     message = message.replace("\\", "\\\\")
     message = message.replace("\"", "\\\"")
@@ -49,12 +49,12 @@ def log_graphviz(repo, sha, seen):
     print(f"  c_{sha} [label=\"{sha[0:7]}: {message}\"]")
 
     # Base case
-    if b'parent' not in commit.commitdata:
+    if b'parent' not in commit_obj.commitdata:
         return
 
     
     # Recursive case - traverse the parents
-    parents = commit.commitdata[b'parent']
+    parents = commit_obj.commitdata[b'parent']
     if type(parents) != list:
         parents = [parents]
     for p in parents:

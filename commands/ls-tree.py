@@ -1,4 +1,4 @@
-from objects.GitRepo import repo_find, object_read, object_find
+from objects.GitRepo import repo_find, object_read, sha_find
 import sys,os
 
 def register(subparsers):
@@ -39,7 +39,7 @@ def get_obj_type_based_on_mode(mode):
 
 def ls_tree(repo, ref, recursive=None, prefix=""):
     # Find sha based on arguments
-    sha = object_find(repo, ref, b'tree')
+    sha = sha_find(repo, ref, b'tree')
     # Return tree object based on sha
     found_obj = object_read(repo, sha)
     # Display tree object contents based on mode

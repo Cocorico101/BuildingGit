@@ -156,23 +156,25 @@ def object_write(repo, obj):
                 file.write(zlib.compress(payload))
     return sha
             
-def object_find(repo, name, fmt=None, follow=True):
+def sha_find(repo, name, fmt=None, follow=True):
     """
     If name is HEAD: resole to .git/HEAD
     If name is a full hash, hash is returned unmodified    
+    Returns sha
     """
-    found_obj = None
+    sha = None
     pattern = r"^[a-zA-Z0-9]{40}$"
     if name == 'HEAD':
-        found_obj = ref_find(repo, name)
-    elif re.search(pattern, name):
-        found_obj = name
-    return found_obj
+        sha = ref_find(repo, name)
+    elif re.match(pattern, name):
+        sha = name
+
+    return sha
 
 def ref_find(repo, ref):
     """
     Symbolic link ref: refs/remotes/origin/master
-
+    Returns the sha associated with the ref
     """
     # A path to a file
     path = repo_file(repo, ref)
