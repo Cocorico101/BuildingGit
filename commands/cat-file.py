@@ -21,9 +21,9 @@ def cmd_cat_file(args):
     """
     repo = repo_find()
     sha = sha_find(repo, args.object, args.type.encode())
-    print(f"sha: {sha}")
-    found_obj = object_read(repo, sha)
-    if found_obj and found_obj.fmt != args.type.encode():
-        print("Object not found or type do not match")
+    if not sha:
+        print(f"Error: Object {args.object} not found or type mismatch", file=sys.stderr)
         sys.exit(1)
+    found_obj = object_read(repo, sha)
+    print(f"found_obj {found_obj}")
     sys.stdout.buffer.write(found_obj.serialize())

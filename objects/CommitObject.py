@@ -21,7 +21,10 @@ def commit_serialize(commit):
     Build the commit object
     """
     data = b''
-    for key,value in commit:
+    for key, value in commit.items():
+        # Skip the message (stored at None key), we'll add it at the end
+        if key is None:
+            continue
         # Normalize value to a list
         if type(value) != list:
             value = [value]

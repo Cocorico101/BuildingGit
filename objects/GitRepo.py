@@ -158,9 +158,9 @@ def object_write(repo, obj):
             
 def sha_find(repo, name, fmt=None, follow=True):
     """
-    If name is HEAD: resole to .git/HEAD
+    If name is HEAD: resolve to .git/HEAD
     If name is a full hash, hash is returned unmodified    
-    Returns sha
+    Returns sha, or None if type validation fails
     """
     sha = None
     pattern = r"^[a-zA-Z0-9]{40}$"
@@ -168,7 +168,16 @@ def sha_find(repo, name, fmt=None, follow=True):
         sha = ref_find(repo, name)
     elif re.match(pattern, name):
         sha = name
+    else:
+        # Try as a ref (branch name)
+        sha = ref_find(repo, name)
 
+    # Validate type if requested
+    if sha and fmt:
+        obj = object_read(repo, sha)
+        if obj and obj.fmt != fmt:
+            return None
+    
     return sha
 
 def ref_find(repo, ref):
@@ -187,7 +196,7 @@ def ref_find(repo, ref):
 
 
     # If the file does not contain SHA1 hash, keep recursing
-    if data.startswish("ref: "):
+    if data.startswith("ref: "):
         return ref_find(repo, data[5:])
     return data
 

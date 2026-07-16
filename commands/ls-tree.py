@@ -40,6 +40,9 @@ def get_obj_type_based_on_mode(mode):
 def ls_tree(repo, ref, recursive=None, prefix=""):
     # Find sha based on arguments
     sha = sha_find(repo, ref, b'tree')
+    if not sha:
+        print(f"Error: Tree object {ref} not found", file=sys.stderr)
+        sys.exit(1)
     # Return tree object based on sha
     found_obj = object_read(repo, sha)
     # Display tree object contents based on mode

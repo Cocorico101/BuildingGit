@@ -9,8 +9,18 @@ This is not a full replacement for Git. The goal is to understand how Git intern
 
 - Repository initialization
 - Object hashing and object writes
-- Object content display
+- Object content display (cat-file)
+- Tree object listing (ls-tree) with recursion support
 - Commit history traversal output in DOT format (for Graphviz)
+- Full SHA-1 hash lookup
+- HEAD and symbolic ref resolution
+
+## Features NOT Yet Implemented
+
+- Short hash lookup (e.g., first 7 characters)
+- Branch name resolution (e.g., `master`, `main`)
+- Tag resolution
+- Commit object traversal via refs
 
 ## Project Layout
 

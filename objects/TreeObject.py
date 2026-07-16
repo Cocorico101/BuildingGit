@@ -26,7 +26,7 @@ def tree_leaf_sort_key(leaf):
 
 
 def tree_serialize(tree_obj):
-    tree_obj.sort(key=tree_leaf_sort_key)
+    tree_obj.tree_data.sort(key=tree_leaf_sort_key)
     raw = b""
     for node in tree_obj.tree_data:
         mode, path, sha = node.mode, node.path, node.sha
