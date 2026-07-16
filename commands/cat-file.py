@@ -20,6 +20,5 @@ def cmd_cat_file(args):
     Display the contents of the object
     """
     repo = repo_find()
-    # TODO: Reimplement object_find appropriately based on the object type after
-    found_obj = object_find(repo, args.type.encode(), args.object)
+    found_obj = object_find(repo, args.object, args.type.encode())
     sys.stdout.buffer.write(object_read(repo, args.object).serialize())

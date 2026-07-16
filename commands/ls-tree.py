@@ -21,7 +21,6 @@ def cmd_ls_tree(args):
     Display the contents of the object
     """
     repo = repo_find()
-    # TODO: Reimplement object_find appropriately based on the object type after
     ls_tree(repo, args.tree, args.recursive)
     
 

@@ -1,5 +1,6 @@
 import os
 import configparser
+import re
 import zlib
 import hashlib
 from .GitObjectFactory import object_create
@@ -156,4 +157,35 @@ def object_write(repo, obj):
     return sha
             
 def object_find(repo, name, fmt=None, follow=True):
-    return name
+    """
+    If name is HEAD: resole to .git/HEAD
+    If name is a full hash, hash is returned unmodified    
+    """
+    found_obj = None
+    pattern = r"^[a-zA-Z0-9]{40}$"
+    if name == 'HEAD':
+        found_obj = ref_find(repo, name)
+    elif re.search(pattern, name):
+        found_obj = name
+    return found_obj
+
+def ref_find(repo, ref):
+    """
+    Symbolic link ref: refs/remotes/origin/master
+
+    """
+    # A path to a file
+    path = repo_file(repo, ref)
+    # Base case
+    if not os.path.isfile(path):
+        return None
+    # Read the file to grab the contents
+    with open(path, 'r') as fp:
+        data = fp.read()[:-1]
+
+
+    # If the file does not contain SHA1 hash, keep recursing
+    if data.startswish("ref: "):
+        return ref_find(repo, data[5:])
+    return data
+
