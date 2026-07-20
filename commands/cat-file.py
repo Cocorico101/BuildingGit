@@ -1,4 +1,6 @@
-from objects.GitRepo import repo_find, object_read, sha_find
+from objects.GitRepo import repo_find
+from objects.GitObjectStore import object_read
+from objects.Refs import sha_find
 import sys
 
 def register(subparsers):
@@ -25,5 +27,9 @@ def cmd_cat_file(args):
         print(f"Error: Object {args.object} not found or type mismatch", file=sys.stderr)
         sys.exit(1)
     found_obj = object_read(repo, sha)
-    print(f"found_obj {found_obj}")
-    sys.stdout.buffer.write(found_obj.serialize())
+    data = found_obj.serialize()
+    sys.stdout.buffer.write(data)
+
+    # Keep shell prompts readable without changing piped output behavior.
+    if sys.stdout.isatty() and (len(data) == 0 or data[-1] != 0x0A):
+        sys.stdout.write("\n")

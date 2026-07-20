@@ -1,4 +1,5 @@
-from objects.GitRepo import repo_find, object_write
+from objects.GitRepo import repo_find
+from objects.GitObjectStore import object_write
 from objects.GitObjectFactory import object_create
 import sys
 

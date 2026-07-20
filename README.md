@@ -20,14 +20,18 @@ This is not a full replacement for Git. The goal is to understand how Git intern
 - Short hash lookup (e.g., first 7 characters)
 - Branch name resolution (e.g., `master`, `main`)
 - Tag resolution
-- Commit object traversal via refs
+- Full branch and tag listing commands
 
 ## Project Layout
 
 - cores/wyag: CLI entrypoint script
 - cores/libwyag.py: argparse and command registration
-- commands/: command handlers (init, hash-object, cat-file, log)
-- objects/: repository and object model code
+- commands/: command handlers (`init`, `hash-object`, `cat-file`, `log`, `ls-tree`)
+- objects/GitRepo.py: repository discovery and filesystem helpers
+- objects/GitObjectStore.py: low-level object read/write + zlib storage
+- objects/Refs.py: symbolic ref and SHA resolution
+- objects/GitObjectFactory.py: object type to constructor mapping
+- objects/*.py: object models (`BlobObject`, `TreeObject`, `CommitObject`)
 
 ## Requirements
 
@@ -75,6 +79,11 @@ Example:
 
 cores/wyag cat-file blob <sha>
 
+Notes:
+
+- `cat-file` validates object type before printing
+- interactive terminal output keeps prompts readable with a trailing newline when needed
+
 ### 4) Show Commit History as DOT
 
 cores/wyag log <commit_sha>
@@ -93,23 +102,33 @@ Or do it in one pipeline:
 
 cores/wyag log <commit_sha> | dot -Tpdf -o log.pdf
 
+### 5) List Tree Contents
+
+cores/wyag ls-tree [-r] <tree_sha>
+
+Examples:
+
+cores/wyag ls-tree <tree_sha>
+cores/wyag ls-tree -r <tree_sha>
+
 ## Notes About log
 
 - log currently traverses commit parents recursively.
-- Node labels include short SHA and first line of commit message.
+- Node labels include short SHA and a sanitized single-line commit message.
 - Special characters in commit messages are escaped for DOT safety.
+- Invalid input now fails cleanly with a user-facing error message.
 
 ## Current Limitations
 
-- object_find currently returns the provided name directly and does not fully resolve references (for example HEAD to refs/heads/... to SHA).
-- cat-file currently reads args.object directly instead of using the resolved value from object_find.
-- Type validation and object resolution behavior are still minimal.
+- `hash-object` currently writes objects when a repo is found, even if `-w` is omitted.
+- SHA resolution accepts full 40-character hashes and symbolic refs; short hash disambiguation is not implemented.
+- Error handling is still being standardized across all commands.
 
 ## Learning Goals
 
 The good next milestones are:
 
 1. Implement proper ref resolution for HEAD and branch names.
-2. Improve object_find to support short SHA lookup and ambiguity checks.
+2. Add short SHA lookup with ambiguity checks.
 3. Add checkout, commit, and tree walking commands.
-4. Add unit tests for parser and object resolution behavior.
+4. Add unit tests for parser, object storage, and command behavior.

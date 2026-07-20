@@ -1,4 +1,6 @@
-from objects.GitRepo import repo_find, object_read, sha_find
+from objects.GitRepo import repo_find
+from objects.GitObjectStore import object_read
+from objects.Refs import sha_find
 import sys,os
 
 def register(subparsers):

@@ -1,5 +1,7 @@
-from objects.GitRepo import repo_find, object_read, sha_find
-
+from objects.GitRepo import repo_find
+from objects.GitObjectStore import object_read
+from objects.Refs import sha_find
+import sys
 
 
 def register(subparsers):
@@ -16,9 +18,18 @@ def cmd_log(args):
     """
     repo = repo_find()
     sha = sha_find(repo, args.commit)
+    if not sha:
+        print(f"Error: Commit {args.commit} not found", file=sys.stderr)
+        sys.exit(1)
+
+    obj = object_read(repo, sha)
+    if not obj or obj.fmt != b'commit':
+        print(f"Error: {args.commit} is not a commit", file=sys.stderr)
+        sys.exit(1)
+
     seen = set()
-    print("digraph wyaglog{")
-    print("  node[shape=rect]")
+    print("digraph wyaglog {")
+    print("  node [shape=rect];")
     log_graphviz(repo, sha, seen)
     print("}")
 
@@ -35,18 +46,17 @@ def log_graphviz(repo, sha, seen):
     # Find the commit object
     commit_obj = object_read(repo, sha)
 
-    # Assert to make sure the sha points to a commit
-    assert commit_obj.fmt == b'commit'
+    # Skip invalid nodes defensively; cmd_log does the user-facing validation.
+    if not commit_obj or commit_obj.fmt != b'commit':
+        return
         
     # Display the commit messages - human readable
-    message = commit_obj.commitdata[None].decode("utf8").strip()
+    message = commit_obj.commitdata.get(None, b"").decode("utf8", errors="replace")
+    message = " ".join(message.splitlines()).strip()
     # Escape special characters
     message = message.replace("\\", "\\\\")
     message = message.replace("\"", "\\\"")
-    # Only display the first line of the message
-    if '\n' in message:
-        message = message[:message.index('\n')]
-    print(f"  c_{sha} [label=\"{sha[0:7]}: {message}\"]")
+    print(f"  c_{sha} [label=\"{sha[0:7]}: {message}\"];")
 
     # Base case
     if b'parent' not in commit_obj.commitdata:
@@ -60,5 +70,5 @@ def log_graphviz(repo, sha, seen):
     for p in parents:
         # parent value is commit hash in hex, which is ascii
         p = p.decode('ascii')
-        print (f"  c_{sha} -> c_{p};")
+        print(f"  c_{sha} -> c_{p};")
         log_graphviz(repo, p, seen)
